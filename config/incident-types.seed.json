@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "description": "Phase 0 seed — import in Phase 1 TypeORM migration or seed script",
+  "incidentTypes": [
+    {
+      "code": "extortion",
+      "labelEn": "Extortion",
+      "labelBn": "চাঁদাবাজি",
+      "iconKey": "HandCoins",
+      "iconUrl": null,
+      "markerColor": "#ef4444",
+      "isHealth": false,
+      "contentWarning": true,
+      "sortOrder": 1,
+      "isActive": true
+    },
+    {
+      "code": "measles",
+      "labelEn": "Measles",
+      "labelBn": "হাম",
+      "iconKey": "Syringe",
+      "iconUrl": null,
+      "markerColor": "#a855f7",
+      "isHealth": true,
+      "contentWarning": false,
+      "sortOrder": 2,
+      "isActive": true
+    },
+    {
+      "code": "kidnap",
+      "labelEn": "Kidnap / abduction",
+      "labelBn": "অপহরণ",
+      "iconKey": "UserX",
+      "iconUrl": null,
+      "markerColor": "#6366f1",
+      "isHealth": false,
+      "contentWarning": true,
+      "sortOrder": 3,
+      "isActive": true
+    },
+    {
+      "code": "dengue",
+      "labelEn": "Dengue",
+      "labelBn": "ডেঙ্গু",
+      "iconKey": "Bug",
+      "iconUrl": null,
+      "markerColor": "#10b981",
+      "isHealth": true,
+      "contentWarning": false,
+      "sortOrder": 4,
+      "isActive": true
+    }
+  ]
+}

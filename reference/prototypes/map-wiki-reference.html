@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bangladesh districts — Wikimedia reference (static)</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #fff; font-family: system-ui, sans-serif; }
+    #bar {
+      position: fixed; z-index: 2; top: 0; left: 0; right: 0;
+      padding: 10px 14px; background: rgba(255,255,255,.92);
+      border-bottom: 1px solid #ddd; font-size: 13px;
+    }
+    #bar a { color: #0645ad; }
+    #wrap {
+      position: absolute; top: 44px; left: 0; right: 0; bottom: 0;
+      overflow: auto; display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    object { max-width: 100%; max-height: 100%; width: min(900px, 100%); }
+  </style>
+</head>
+<body>
+  <div id="bar">
+    Static reference:
+    <a href="https://commons.wikimedia.org/wiki/File:COVID-19_outbreak_Bangladesh_District_Wise_cases_map.svg">Wikimedia Commons</a>
+    — no district labels in file; use
+    <a href="map-viewer.html">interactive map</a> for names &amp; hover.
+  </div>
+  <div id="wrap">
+    <object
+      type="image/svg+xml"
+      data="COVID-19_outbreak_Bangladesh_District_Wise_cases_map.svg"
+      title="Bangladesh district map reference"
+    ></object>
+  </div>
+</body>
+</html>

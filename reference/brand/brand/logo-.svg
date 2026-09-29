@@ -1,0 +1,8 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Red 'L' Element -->
+  <path d="M 10 10 H 28 V 72 L 68 88 H 10 Z" fill="#D31329" />
+  
+  <!-- Amber 'K' Chevrons -->
+  <path d="M 88 10 L 32 50 L 52 50 L 92 18 Z" fill="#E59E24" />
+  <path d="M 52 50 L 32 50 L 72 90 L 92 90 Z" fill="#E59E24" />
+</svg>

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bangladesh admin map viewer</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; font-family: system-ui, Segoe UI, sans-serif; }
+    #map { width: 100%; height: 100%; background: #ffffff; }
+    #panel {
+      position: absolute;
+      z-index: 1000;
+      top: 12px;
+      left: 12px;
+      max-width: 320px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.15);
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    #panel h1 { margin: 0 0 8px; font-size: 15px; font-weight: 600; }
+    #panel label { display: flex; align-items: center; gap: 8px; margin: 6px 0; cursor: pointer; }
+    #status { margin-top: 10px; color: #444; min-height: 2.5em; }
+    #status.err { color: #b00020; }
+    .hint { color: #666; font-size: 12px; margin-top: 8px; }
+    .leaflet-tooltip {
+      font-size: 12px;
+      line-height: 1.35;
+      padding: 6px 8px;
+    }
+    .map-label {
+      background: transparent !important;
+      border: none !important;
+      width: auto !important;
+      margin: 0 !important;
+    }
+    .map-label .lbl-wrap {
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+    .map-label .lbl-text {
+      display: inline-block;
+      white-space: nowrap;
+      font-family: system-ui, "Segoe UI", sans-serif;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #111;
+      letter-spacing: 0.01em;
+      -webkit-text-stroke: 2px #fff;
+      paint-order: stroke fill;
+      text-shadow:
+        0 0 3px #fff,
+        0 0 6px #fff,
+        1px 0 0 #fff,
+        -1px 0 0 #fff,
+        0 1px 0 #fff,
+        0 -1px 0 #fff;
+    }
+    .lbl-division .lbl-text { color: #0b4d2a; }
+    .map-label.is-hidden { opacity: 0 !important; }
+    #lang-toggle {
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f5f5f5;
+    }
+    #lang-toggle:hover { background: #ebebeb; }
+    #lang-toggle.is-bn { background: #e8f5e9; border-color: #81c784; }
+    .map-label.lang-bn .lbl-text {
+      font-family: "Noto Sans Bengali", "Segoe UI", system-ui, sans-serif;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="panel">
+    <h1>BD admin boundaries</h1>
+    <label><input type="checkbox" id="ly-div" /> Division (ADM1)</label>
+    <label><input type="checkbox" id="ly-dist" checked /> District (ADM2)</label>
+    <label><input type="checkbox" id="ly-upa" /> Upazila (ADM3)</label>
+    <label><input type="checkbox" id="ly-union" /> Union / ADM4 polygons</label>
+    <label><input type="checkbox" id="ly-lbl-div" /> Division names on map</label>
+    <label><input type="checkbox" id="ly-lbl-dist" checked /> District names on map</label>
+    <button type="button" id="lang-toggle" aria-pressed="false">ভাষা: English → বাংলা</button>
+    <p class="hint">Toggle map labels &amp; tooltips. Zoom in for larger names.</p>
+    <div id="status">Starting…</div>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+  <script>
+    /** GeoJSON base URL — must be served over http (see serve-map.ps1). */
+    const DATA_BASE = new URLSearchParams(location.search).get('data')
+      || 'http://127.0.0.1:8765';
+
+    const PATHS = {
+      adm1: 'bgd_admin_boundaries.geojson/bgd_admin1.geojson',
+      adm2: 'bgd_admin_boundaries.geojson/bgd_admin2.geojson',
+      adm3: 'bgd_admin_boundaries.geojson/bgd_admin3.geojson',
+      adm4: 'geoBoundaries-BGD-ADM4_simplified.geojson',
+      points: 'bgd_admin_boundaries.geojson/bgd_adminpoints.geojson',
+      bdDistricts: 'bangladesh-geojson/src/data/bd-districts.json',
+      bdDivisions: 'bangladesh-geojson/src/data/bd-divisions.json',
+    };
+
+    /** @type {'en'|'bn'} */
+    let uiLang = 'en';
+    const DISTRICT_EN_ALIASES = {
+      Netrakona: 'Netrokona',
+      Khagrachhari: 'Khagrachari',
+      Sirajganj: 'Sirajgonj',
+      Moulvibazar: 'Maulvibazar',
+      Chapainababganj: 'Nawabganj',
+    };
+    const DISTRICT_BN_OVERRIDE = {
+      Chapainababganj: 'চাঁপাইনবাবগঞ্জ',
+    };
+
+    const statusEl = document.getElementById('status');
+    function setStatus(msg, isErr) {
+      statusEl.textContent = msg;
+      statusEl.classList.toggle('err', !!isErr);
+    }
+
+    const map = L.map('map', {
+      preferCanvas: true,
+      zoomControl: true,
+      attributionControl: false,
+      minZoom: 6,
+      maxZoom: 16,
+    }).setView([23.7, 90.35], 7);
+
+    const layers = {
+      country: L.layerGroup().addTo(map),
+      div: L.layerGroup().addTo(map),
+      dist: L.layerGroup().addTo(map),
+      upa: L.layerGroup(),
+      union: L.layerGroup(),
+      labelsDiv: L.layerGroup(),
+      labelsDist: L.layerGroup(),
+    };
+
+    const cache = {
+      adm4Points: null,
+      adm1: null,
+      adm2: null,
+      bnDistrict: null,
+      bnDivision: null,
+    };
+    const labelRegistry = { district: [], division: [] };
+    let zoomLabelRaf = null;
+
+    function url(path) {
+      return DATA_BASE.replace(/\/$/, '') + '/' + path;
+    }
+
+    async function fetchJson(path) {
+      const r = await fetch(url(path));
+      if (!r.ok) throw new Error(path + ' → HTTP ' + r.status);
+      return r.json();
+    }
+
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function normKey(s) {
+      return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    async function loadBnLookups() {
+      if (cache.bnDistrict) return;
+      const [dRaw, vRaw] = await Promise.all([
+        fetchJson(PATHS.bdDistricts),
+        fetchJson(PATHS.bdDivisions),
+      ]);
+      cache.bnDistrict = new Map();
+      for (const d of dRaw.districts) {
+        cache.bnDistrict.set(normKey(d.name), d.bn_name);
+      }
+      cache.bnDivision = new Map();
+      for (const d of vRaw.divisions) {
+        cache.bnDivision.set(normKey(d.name), d.bn_name);
+      }
+    }
+
+    function districtBn(enName) {
+      if (!enName) return '';
+      if (DISTRICT_BN_OVERRIDE[enName]) return DISTRICT_BN_OVERRIDE[enName];
+      const canonical = DISTRICT_EN_ALIASES[enName] || enName;
+      return cache.bnDistrict?.get(normKey(canonical)) || '';
+    }
+
+    function divisionBn(enName) {
+      if (!enName) return '';
+      return cache.bnDivision?.get(normKey(enName)) || '';
+    }
+
+    function districtLabel(p) {
+      const en = p.adm2_name || '';
+      if (uiLang === 'en') return en;
+      return districtBn(en) || en;
+    }
+
+    function divisionLabel(p) {
+      const en = p.adm1_name || '';
+      if (uiLang === 'en') return en;
+      return divisionBn(en) || en;
+    }
+
+    function upazilaLabel(p) {
+      const en = p.adm3_name || '';
+      return en;
+    }
+
+    const LBL = {
+      en: { division: 'Division', district: 'District', upazila: 'Upazila', union: 'Union / ADM4', country: 'Country' },
+      bn: { division: 'বিভাগ', district: 'জেলা', upazila: 'উপজেলা', union: 'ইউনিয়ন', country: 'বাংলাদেশ' },
+    };
+
+    function tooltipDiv(p) {
+      const t = LBL[uiLang];
+      const lines = [];
+      if (p.adm1_name) {
+        const nm = uiLang === 'bn' ? (divisionBn(p.adm1_name) || p.adm1_name) : p.adm1_name;
+        lines.push(`<b>${t.division}</b> ${esc(nm)}` + (p.adm1_pcode ? ` <small>(${esc(p.adm1_pcode)})</small>` : ''));
+      }
+      if (p.adm2_name) {
+        const nm = districtLabel(p);
+        lines.push(`<b>${t.district}</b> ${esc(nm)}` + (p.adm2_pcode ? ` <small>(${esc(p.adm2_pcode)})</small>` : ''));
+      }
+      if (p.adm3_name) {
+        lines.push(`<b>${t.upazila}</b> ${esc(upazilaLabel(p))}` + (p.adm3_pcode ? ` <small>(${esc(p.adm3_pcode)})</small>` : ''));
+      }
+      const unionName = p.union_name || p.name || p.shapeName;
+      if (unionName && (p.adm4_pcode || p.shapeType === 'ADM4')) {
+        lines.push(`<b>${t.union}</b> ` + esc(unionName) + (p.adm4_pcode ? ` <small>(${esc(p.adm4_pcode)})</small>` : ''));
+      }
+      if (!lines.length && p.shapeName) lines.push('<b>Area</b> ' + esc(p.shapeName));
+      return lines.join('<br/>') || '—';
+    }
+
+    function featureCenter(feature) {
+      const p = feature.properties;
+      if (p.center_lat != null && p.center_lon != null) {
+        const lat = parseFloat(p.center_lat);
+        const lon = parseFloat(p.center_lon);
+        if (!Number.isNaN(lat) && !Number.isNaN(lon)) return [lat, lon];
+      }
+      const c = turf.centroid(feature);
+      return [c.geometry.coordinates[1], c.geometry.coordinates[0]];
+    }
+
+    function interiorLatLng(feature) {
+      try {
+        const pt = turf.pointOnFeature(feature);
+        const [lon, lat] = pt.geometry.coordinates;
+        return [lat, lon];
+      } catch {
+        return featureCenter(feature);
+      }
+    }
+
+    function districtFontPx(zoom) {
+      return Math.max(8, 6 + (zoom - 6) * 3.2);
+    }
+
+    function divisionFontPx(zoom) {
+      return Math.max(10, 8 + (zoom - 6) * 3.5);
+    }
+
+    function labelBoxPx(feature) {
+      const b = turf.bbox(feature);
+      const sw = map.latLngToContainerPoint([b[1], b[0]]);
+      const ne = map.latLngToContainerPoint([b[3], b[2]]);
+      return {
+        w: Math.abs(ne.x - sw.x),
+        h: Math.abs(ne.y - sw.y),
+      };
+    }
+
+    /** Largest single-line label that fits the district on screen (grows when you zoom in). */
+    function computeLabelLayout(name, feature, basePx, kind) {
+      const zoom = map.getZoom();
+      const { w, h } = labelBoxPx(feature);
+      const maxW = Math.max(40, Math.round(w * 0.88));
+      const maxH = h * (kind === 'division' ? 0.45 : 0.38);
+      const charW = uiLang === 'bn' ? 0.72 : 0.55;
+      const maxCap = kind === 'division' ? 52 : 46;
+
+      if (kind === 'district' && w < 50 && zoom < 7.5) {
+        return { hide: true };
+      }
+
+      const fitByWidth = Math.floor(maxW / (name.length * charW));
+      const fitByHeight = Math.floor(maxH / 1.25);
+      let fontPx = Math.min(fitByWidth, fitByHeight, maxCap);
+      fontPx = Math.max(8, fontPx);
+
+      const textW = name.length * fontPx * charW;
+      if (textW > maxW * 1.08) {
+        return { hide: kind === 'district' && zoom < 8.5 };
+      }
+
+      return {
+        hide: false,
+        fontPx: Math.round(fontPx),
+      };
+    }
+
+    function labelIconHtml(name, layout, spanClass) {
+      if (layout.hide) return '';
+      const langClass = uiLang === 'bn' ? ' lang-bn' : '';
+      return (
+        `<div class="lbl-wrap ${spanClass}${langClass}">` +
+        `<span class="lbl-text" style="font-size:${layout.fontPx}px">${esc(name)}</span>` +
+        `</div>`
+      );
+    }
+
+    function refreshAllLabels() {
+      for (const kind of ['district', 'division']) {
+        for (const entry of labelRegistry[kind]) {
+          const getName = kind === 'district' ? districtLabel : divisionLabel;
+          entry.name = getName(entry.feature.properties);
+        }
+      }
+      refreshZoomLabels();
+    }
+
+    function updateLangToggleUi() {
+      const btn = document.getElementById('lang-toggle');
+      const isBn = uiLang === 'bn';
+      btn.setAttribute('aria-pressed', isBn ? 'true' : 'false');
+      btn.classList.toggle('is-bn', isBn);
+      btn.textContent = isBn ? 'ভাষা: বাংলা → English' : 'ভাষা: English → বাংলা';
+    }
+
+    async function setUiLang(lang) {
+      uiLang = lang;
+      await loadBnLookups();
+      updateLangToggleUi();
+      refreshAllLabels();
+    }
+
+    function registerZoomLabels(kind, geojson, getName, labelGroup, spanClass, fontFn) {
+      labelGroup.clearLayers();
+      labelRegistry[kind] = [];
+      const zoom = map.getZoom();
+      for (const feature of geojson.features) {
+        const name = getName(feature.properties);
+        if (!name) continue;
+        const latlng = interiorLatLng(feature);
+        const layout = computeLabelLayout(name, feature, fontFn(zoom), kind);
+        const marker = L.marker(latlng, {
+          icon: L.divIcon({
+            className: layout.hide ? 'map-label is-hidden' : 'map-label',
+            html: labelIconHtml(name, layout, spanClass),
+            iconSize: [0, 0],
+          }),
+          interactive: false,
+        }).addTo(labelGroup);
+        labelRegistry[kind].push({ feature, name, marker, spanClass, fontFn, kind });
+      }
+      refreshZoomLabels();
+    }
+
+    function refreshZoomLabels() {
+      const zoom = map.getZoom();
+      for (const kind of ['district', 'division']) {
+        for (const entry of labelRegistry[kind]) {
+          const layout = computeLabelLayout(
+            entry.name,
+            entry.feature,
+            entry.fontFn(zoom),
+            entry.kind
+          );
+          entry.marker.setIcon(L.divIcon({
+            className: layout.hide ? 'map-label is-hidden' : 'map-label',
+            html: labelIconHtml(entry.name, layout, entry.spanClass),
+            iconSize: [0, 0],
+          }));
+        }
+      }
+    }
+
+    map.on('zoom', () => {
+      if (zoomLabelRaf) return;
+      zoomLabelRaf = requestAnimationFrame(() => {
+        refreshZoomLabels();
+        zoomLabelRaf = null;
+      });
+    });
+
+    function syncLabelsOnMap() {
+      const showDiv = document.getElementById('ly-lbl-div').checked;
+      const showDist = document.getElementById('ly-lbl-dist').checked;
+      const distOn = document.getElementById('ly-dist').checked;
+      const divOn = document.getElementById('ly-div').checked;
+
+      // Avoid stacking division + district labels on the same view (unreadable overlap).
+      const showDivisionLabels = showDiv && cache.adm1 && divOn && !(distOn && showDist);
+
+      if (showDivisionLabels) {
+        if (!map.hasLayer(layers.labelsDiv)) layers.labelsDiv.addTo(map);
+      } else if (map.hasLayer(layers.labelsDiv)) {
+        map.removeLayer(layers.labelsDiv);
+      }
+
+      if (showDist && distOn && cache.adm2) {
+        if (!map.hasLayer(layers.labelsDist)) layers.labelsDist.addTo(map);
+      } else if (map.hasLayer(layers.labelsDist)) {
+        map.removeLayer(layers.labelsDist);
+      }
+    }
+
+    async function ensureDivisionLabels() {
+      if (!cache.adm1) cache.adm1 = await fetchJson(PATHS.adm1);
+      registerZoomLabels('division', cache.adm1, divisionLabel, layers.labelsDiv, 'lbl-division', divisionFontPx);
+      syncLabelsOnMap();
+    }
+
+    async function ensureDistrictLabels() {
+      if (!cache.adm2) cache.adm2 = await fetchJson(PATHS.adm2);
+      registerZoomLabels('district', cache.adm2, districtLabel, layers.labelsDist, 'lbl-district', districtFontPx);
+      syncLabelsOnMap();
+    }
+
+    /** Stable, distinct fill per district (64 hues, comfortable saturation). */
+    const districtHueByKey = new Map();
+    function districtHue(feature) {
+      const key = feature.properties.adm2_pcode || feature.properties.adm2_name || '';
+      if (districtHueByKey.has(key)) return districtHueByKey.get(key);
+      let hash = 0;
+      for (let i = 0; i < key.length; i++) hash = (hash * 33 + key.charCodeAt(i)) >>> 0;
+      const hue = (hash * 137.508) % 360;
+      districtHueByKey.set(key, hue);
+      return hue;
+    }
+
+    /** Stroke/fill tuned to Commons COVID district map (#73706C borders, soft fills). */
+    const WIKI_STROKE = '#73706C';
+
+    function districtStyle(feature) {
+      const hue = districtHue(feature);
+      return {
+        color: WIKI_STROKE,
+        weight: 0.55,
+        fillColor: `hsl(${hue}, 46%, 76%)`,
+        fillOpacity: 1,
+      };
+    }
+
+    function bindLayer(geojson, style, layerGroup, opts = {}) {
+      L.geoJSON(geojson, {
+        style,
+        onEachFeature(feature, layer) {
+          const tip = () => tooltipDiv(feature.properties);
+          layer.bindTooltip(tip(), { sticky: true, direction: 'top', opacity: 0.95 });
+          layer.on('mouseover', () => {
+            if (opts.enrichUnion) attachElectionMeta(feature);
+            layer.setTooltipContent(tip());
+            const s = style(feature);
+            layer.setStyle({
+              ...s,
+              weight: 2.5,
+              fillOpacity: Math.min(0.92, (s.fillOpacity ?? 0.78) + 0.1),
+            });
+          });
+          layer.on('mouseout', () => layer.setStyle(style(feature)));
+        },
+      }).addTo(layerGroup);
+    }
+
+    async function loadAdm4Points() {
+      if (cache.adm4Points) return cache.adm4Points;
+      setStatus('Loading ADM4 reference points…');
+      const raw = await fetchJson(PATHS.points);
+      const feats = raw.features.filter((f) => f.properties.admin_level === 4);
+      cache.adm4Points = turf.featureCollection(
+        feats.map((f) => {
+          const p = f.properties;
+          const lon = parseFloat(p.x_coord);
+          const lat = parseFloat(p.y_coord);
+          return turf.point([lon, lat], { ...p });
+        })
+      );
+      return cache.adm4Points;
+    }
+
+    function attachElectionMeta(feature) {
+      if (feature.properties.adm4_pcode || !cache.adm4Points) return;
+      const inside = turf.pointsWithinPolygon(cache.adm4Points, feature);
+      const hit = inside.features[0]?.properties;
+      if (!hit) return;
+      Object.assign(feature.properties, {
+        union_name: hit.name,
+        adm4_pcode: hit.adm4_pcode,
+        adm3_name: hit.adm3_name,
+        adm3_pcode: hit.adm3_pcode,
+        adm2_name: hit.adm2_name,
+        adm2_pcode: hit.adm2_pcode,
+        adm1_name: hit.adm1_name,
+        adm1_pcode: hit.adm1_pcode,
+      });
+    }
+
+    const loaded = { country: false, div: false, dist: false, upa: false, union: false };
+
+    async function ensureCountryOutline() {
+      if (loaded.country) return;
+      setStatus('Loading Bangladesh outline…');
+      const gj = await fetchJson('bgd_admin_boundaries.geojson/bgd_admin0.geojson');
+      const outline = L.geoJSON(gj, {
+        interactive: true,
+        style: {
+          color: WIKI_STROKE,
+          weight: 1.2,
+          fillColor: '#ffffff',
+          fillOpacity: 1,
+        },
+        onEachFeature(feature, layer) {
+          layer.bindTooltip(
+            '<b>Country</b> ' + esc(feature.properties.adm0_name || 'Bangladesh'),
+            { sticky: true }
+          );
+        },
+      }).addTo(layers.country);
+      const b = outline.getBounds();
+      map.fitBounds(b, { padding: [24, 24] });
+      map.setMaxBounds(b.pad(0.02));
+      loaded.country = true;
+    }
+
+    async function ensureLayer(key) {
+      if (loaded[key]) return;
+      try {
+        if (key === 'div') {
+          setStatus('Loading divisions…');
+          const gj = await fetchJson(PATHS.adm1);
+          cache.adm1 = gj;
+          bindLayer(gj, () => ({
+            color: WIKI_STROKE, weight: 1, fillColor: '#e8e8e8', fillOpacity: 0.35,
+          }), layers.div);
+          registerZoomLabels('division', gj, divisionLabel, layers.labelsDiv, 'lbl-division', divisionFontPx);
+        }
+        if (key === 'dist') {
+          setStatus('Loading districts (~20 MB)…');
+          const gj = await fetchJson(PATHS.adm2);
+          cache.adm2 = gj;
+          bindLayer(gj, districtStyle, layers.dist);
+          registerZoomLabels('district', gj, districtLabel, layers.labelsDist, 'lbl-district', districtFontPx);
+          await ensureDivisionLabels();
+        }
+        if (key === 'upa') {
+          setStatus('Loading upazilas (~48 MB)…');
+          const gj = await fetchJson(PATHS.adm3);
+          bindLayer(gj, () => ({
+            color: '#6a1b9a', weight: 1, fillColor: '#9c27b0', fillOpacity: 0.15,
+          }), layers.upa);
+        }
+        if (key === 'union') {
+          setStatus('Loading ADM4 polygons (~12 MB)…');
+          await loadAdm4Points();
+          const gj = await fetchJson(PATHS.adm4);
+          bindLayer(gj, () => ({
+            color: '#e65100', weight: 0.6, fillColor: '#ff9800', fillOpacity: 0.2,
+          }), layers.union, { enrichUnion: true });
+        }
+        loaded[key] = true;
+        syncLabelsOnMap();
+        setStatus('Ready — names on map; hover for P-codes.');
+      } catch (e) {
+        console.error(e);
+        setStatus(
+          'Could not load data. Run .\\serve-map.ps1 then open http://127.0.0.1:8765/_map/map-viewer.html — ' + e.message,
+          true
+        );
+      }
+    }
+
+    const adminLayerToggles = [];
+
+    function syncLayer(key, checkbox, group, defaultOn) {
+      if (['dist', 'upa', 'union'].includes(key)) adminLayerToggles.push({ key, checkbox, group });
+      const apply = async () => {
+        if (checkbox.checked) {
+          await ensureCountryOutline();
+          await ensureLayer(key);
+          if (!map.hasLayer(group)) group.addTo(map);
+        } else if (map.hasLayer(group)) {
+          map.removeLayer(group);
+        }
+      };
+      checkbox.addEventListener('change', async () => {
+        if (checkbox.checked && ['dist', 'upa', 'union'].includes(key)) {
+          for (const other of adminLayerToggles) {
+            if (other.key === key) continue;
+            other.checkbox.checked = false;
+            if (map.hasLayer(other.group)) map.removeLayer(other.group);
+          }
+        }
+        await apply();
+        syncLabelsOnMap();
+      });
+      if (defaultOn) apply();
+    }
+
+    ['ly-lbl-div', 'ly-lbl-dist'].forEach((id) => {
+      document.getElementById(id).addEventListener('change', () => syncLabelsOnMap());
+    });
+
+    syncLayer('div', document.getElementById('ly-div'), layers.div, false);
+    syncLayer('dist', document.getElementById('ly-dist'), layers.dist, true);
+    syncLayer('upa', document.getElementById('ly-upa'), layers.upa, false);
+    syncLayer('union', document.getElementById('ly-union'), layers.union, false);
+
+    document.getElementById('lang-toggle').addEventListener('click', () => {
+      setUiLang(uiLang === 'en' ? 'bn' : 'en');
+    });
+
+    loadBnLookups().then(() => {
+      ensureCountryOutline().then(() => ensureLayer('dist'));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "https://YOUR_API_HOST/api/v1/sitemap.xml"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/robots.txt"
+  to = "https://YOUR_API_HOST/api/v1/robots.txt"
+  status = 200
+  force = true
+
+# For incident HTML meta-injection on Netlify, add a function mirroring api/incident-meta.ts (Vercel).
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnp.*
+
+# Env (never commit secrets)
+.env
+.env.local
+.env.*.local
+apps/api/.env.local
+apps/web/.env
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Cache
+.cache/
+*.local
+
+# Coverage
+coverage/
+
+# Reference — large local assets (see reference/README.md)
+reference/maps/
+reference/geo/*_files/
+reference/geo/*.html
+*.mbtiles
+
+# Vendored geo clone dev deps
+reference/geo/bangladesh-geojson/node_modules/

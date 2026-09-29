@@ -1,0 +1,175 @@
+{
+  "matchedUpazila": 404,
+  "matchedUnion": 1974,
+  "unmatchedUpazila": 146,
+  "unmatchedUnion": 1403,
+  "sampleUnmatchedUpazila": [
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4050",
+      "districtBn": "কুষ্টিয়া",
+      "nameBn": "কুমারখালী"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4047",
+      "districtBn": "খুলনা",
+      "nameBn": "কয়রা"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4047",
+      "districtBn": "খুলনা",
+      "nameBn": "বটিয়াঘাটা"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4018",
+      "districtBn": "চুয়াডাঙ্গা",
+      "nameBn": "জীবননগর"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4018",
+      "districtBn": "চুয়াডাঙ্গা",
+      "nameBn": "দামুড়হুদা"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4044",
+      "districtBn": "ঝিনাইদহ",
+      "nameBn": "কোটচাঁদপুর"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4001",
+      "districtBn": "বাগেরহাট",
+      "nameBn": "চিতলমারী"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4001",
+      "districtBn": "বাগেরহাট",
+      "nameBn": "মোংলা"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4001",
+      "districtBn": "বাগেরহাট",
+      "nameBn": "মোড়েলগঞ্জ"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4001",
+      "districtBn": "বাগেরহাট",
+      "nameBn": "শরণখোলা"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4055",
+      "districtBn": "মাগুরা",
+      "nameBn": "মহম্মদপুর"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4057",
+      "districtBn": "মেহেরপুর",
+      "nameBn": "মুজিবনগর"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4041",
+      "districtBn": "যশোর",
+      "nameBn": "বাঘারপাড়া"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4041",
+      "districtBn": "যশোর",
+      "nameBn": "যশোর সদর"
+    },
+    {
+      "reason": "upazila",
+      "districtPcode": "BD4087",
+      "districtBn": "সাতক্ষীরা",
+      "nameBn": "দেবহাটা"
+    }
+  ],
+  "sampleUnmatchedUnion": [
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405079",
+      "nameBn": "মজমপুর"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405079",
+      "nameBn": "বটতৈল"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405079",
+      "nameBn": "জিয়ারখি"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405079",
+      "nameBn": "আইলচারা"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405079",
+      "nameBn": "উজানগ্রাম"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405079",
+      "nameBn": "আব্দালপুর"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405079",
+      "nameBn": "গোস্বামীদূর্গাপুর"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405063",
+      "nameBn": "ওসমানপুর"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405063",
+      "nameBn": "বেতবাড়ীয়া"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405063",
+      "nameBn": "শোমসপুর"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405063",
+      "nameBn": "আমবাড়িয়া"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405039",
+      "nameBn": "রেফাইতপুর"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405039",
+      "nameBn": "আদাবাড়িয়া"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405039",
+      "nameBn": "বোয়ালিয়া"
+    },
+    {
+      "reason": "union",
+      "upazilaPcode": "BD405039",
+      "nameBn": "রামকৃষ্ণপুর"
+    }
+  ]
+}

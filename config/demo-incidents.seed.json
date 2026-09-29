@@ -1,0 +1,87 @@
+{
+  "incidents": [
+    {
+      "slug": "dengue-alert-dhaka-mohakhali-2026",
+      "type": "dengue",
+      "titleEn": "Dengue cluster reported near Mohakhali",
+      "titleBn": "মহাখালীতে ডেঙ্গু ঝুঁকি",
+      "summaryEn": "Health officials noted several fever cases linked to stagnant water near the link road.",
+      "summaryBn": "লিংক রোডের আশেপাশে জলাবদ্ধতায় জ্বরের রোগী শনাক্ত হয়েছে।",
+      "placeNameEn": "Mohakhali, Dhaka",
+      "placeNameBn": "মহাখালী, ঢাকা",
+      "divisionPcode": "BD30",
+      "districtPcode": "BD3026",
+      "lat": 23.778,
+      "lng": 90.405,
+      "caseCount": 12,
+      "sourceLabel": "Demo — LashKoi seed",
+      "sourceUrl": "https://lashkoi.com",
+      "bannerCaptionEn": "Drain standing water",
+      "occurredAt": "2026-09-28T09:00:00.000Z",
+      "media": {
+        "image": "https://picsum.photos/seed/lk-dengue/800/450"
+      }
+    },
+    {
+      "slug": "kidnap-attempt-chattogram-2026",
+      "type": "kidnap",
+      "titleEn": "Kidnap attempt foiled in Chattogram",
+      "titleBn": "চট্টগ্রামে অপহরণের চেষ্টা ব্যর্থ",
+      "summaryEn": "Police say a minor was recovered within hours after a tip from residents.",
+      "summaryBn": "স্থানীয়দের খবরে কয়েক ঘণ্টার মধ্যে শিশু উদ্ধার হয়েছে বলে পুলিশ জানিয়েছে।",
+      "placeNameEn": "Panchlaish, Chattogram",
+      "placeNameBn": "পাঁচলাইশ, চট্টগ্রাম",
+      "divisionPcode": "BD20",
+      "districtPcode": "BD2015",
+      "lat": 22.347,
+      "lng": 91.832,
+      "sourceLabel": "Demo — LashKoi seed",
+      "sourceUrl": "https://lashkoi.com",
+      "occurredAt": "2026-09-27T14:30:00.000Z",
+      "media": {
+        "image": "https://picsum.photos/seed/lk-kidnap/800/450",
+        "youtube": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      }
+    },
+    {
+      "slug": "measles-outbreak-sylhet-2026",
+      "type": "measles",
+      "titleEn": "Measles cases rise in Sylhet district",
+      "titleBn": "সিলেটে হামের রোগী বৃদ্ধি",
+      "summaryEn": "Vaccination teams deployed to upazila health complexes after case count crossed threshold.",
+      "summaryBn": "রোগী সংখ্যা বাড়ায় উপজেলা স্বাস্থ্য কমপ্লেক্সে টিকাদান দল মোতায়েন।",
+      "placeNameEn": "Zindabazar, Sylhet",
+      "placeNameBn": "জিন্দাবাজার, সিলেট",
+      "divisionPcode": "BD60",
+      "districtPcode": "BD6091",
+      "lat": 24.894,
+      "lng": 91.868,
+      "caseCount": 28,
+      "sourceLabel": "Demo — LashKoi seed",
+      "occurredAt": "2026-09-26T11:00:00.000Z",
+      "media": {
+        "image": "https://picsum.photos/seed/lk-measles/800/450"
+      }
+    },
+    {
+      "slug": "extortion-demand-khulna-2026",
+      "type": "extortion",
+      "titleEn": "Shop owners report extortion calls in Khulna",
+      "titleBn": "খুলনায় চাঁদাবাজির ফোন — দোকানদারদের অভিযোগ",
+      "summaryEn": "Traders filed a joint complaint after repeated payment demands near the old bus stand.",
+      "summaryBn": "পুরনো বাসস্ট্যান্ড এলাকায় বারবার চাঁদা দাবির পর ব্যবসায়ীরা যৌথ অভিযোগ দায়ের করেছে।",
+      "placeNameEn": "Sonadanga, Khulna",
+      "placeNameBn": "সোনাডাঙ্গা, খুলনা",
+      "divisionPcode": "BD40",
+      "districtPcode": "BD4047",
+      "lat": 22.816,
+      "lng": 89.568,
+      "sourceLabel": "Demo — LashKoi seed",
+      "sourceUrl": "https://lashkoi.com",
+      "occurredAt": "2026-09-25T16:45:00.000Z",
+      "media": {
+        "image": "https://picsum.photos/seed/lk-extortion/800/450"
+      }
+    }
+  ]
+}

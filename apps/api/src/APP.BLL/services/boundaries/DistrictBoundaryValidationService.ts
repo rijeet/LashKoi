@@ -5,16 +5,17 @@ import * as path from 'path';
 import type { DataSource } from 'typeorm';
 import { ApiHttpException } from '@shared/exceptions/ApiHttpException';
 import { ErrorCode } from '@shared/enums/ErrorCode.enum';
+import type { FeatureCollection, Geometry } from 'geojson';
 
-type DistrictCollection = GeoJSON.FeatureCollection;
+type DistrictCollection = FeatureCollection;
 
 @Injectable()
 export class DistrictBoundaryValidationService {
-  private geometryByPcode: Map<string, GeoJSON.Geometry> | null = null;
+  private geometryByPcode: Map<string, Geometry> | null = null;
 
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
-  private loadGeometries(): Map<string, GeoJSON.Geometry> {
+  private loadGeometries(): Map<string, Geometry> {
     if (this.geometryByPcode) return this.geometryByPcode;
 
     const defaultPath = path.resolve(
@@ -32,7 +33,7 @@ export class DistrictBoundaryValidationService {
       fs.readFileSync(filePath, 'utf8'),
     ) as DistrictCollection;
 
-    const map = new Map<string, GeoJSON.Geometry>();
+    const map = new Map<string, Geometry>();
     for (const f of collection.features) {
       const pcode =
         (f.properties?.pcode as string) ??

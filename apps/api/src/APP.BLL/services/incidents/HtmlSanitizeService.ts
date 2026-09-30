@@ -1,32 +1,33 @@
-import sanitizeHtml from 'sanitize-html';
+import { FilterXSS } from 'xss';
 
-const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
-  allowedTags: [
-    'p',
-    'h2',
-    'h3',
-    'h4',
-    'strong',
-    'em',
-    'a',
-    'ul',
-    'ol',
-    'li',
-    'blockquote',
-    'img',
-    'figure',
-    'figcaption',
-    'article',
-  ],
-  allowedAttributes: {
-    a: ['href', 'title', 'target', 'rel'],
-    img: ['src', 'alt', 'title'],
-  },
+/** CJS-safe HTML whitelist (Vercel serverless — no jsdom / ESM htmlparser2). */
+const HTML_WHITE_LIST: Record<string, string[]> = {
+  p: [],
+  h2: [],
+  h3: [],
+  h4: [],
+  strong: [],
+  em: [],
+  a: ['href', 'title', 'target', 'rel'],
+  ul: [],
+  ol: [],
+  li: [],
+  blockquote: [],
+  img: ['src', 'alt', 'title'],
+  figure: [],
+  figcaption: [],
+  article: [],
 };
+
+const xssFilter = new FilterXSS({
+  whiteList: HTML_WHITE_LIST,
+  stripIgnoreTag: true,
+  stripIgnoreTagBody: ['script', 'style'],
+});
 
 export class HtmlSanitizeService {
   sanitize(html: string | null | undefined): string | null {
     if (!html) return null;
-    return sanitizeHtml(html, SANITIZE_OPTIONS);
+    return xssFilter.process(html);
   }
 }

@@ -16,7 +16,9 @@ Do not commit real secrets. Run `npm run api:migrate` against Neon before first 
 
 Copy example → `.env.local`, fill values locally. Production secrets live in **Vercel**, not the repo.
 
-If the map shows **“Some data could not load”**, the browser is not reaching **this** API: another app may be using the same `PORT` (e.g. a different Nest project on `:3001`). Set a free port in `PORT`, match `VITE_API_BASE_URL` in `apps/web/.env`, restart both dev servers, and verify `http://localhost:<PORT>/api/v1/incident-types?lang=en` returns JSON (not 404).
+If production shows **“Some data could not load”** on [lash-koi.vercel.app](https://lash-koi.vercel.app/), open `https://lashkoi-api.vercel.app/health`. If you get **500 / FUNCTION_INVOCATION_FAILED**, the serverless API crashed (usually missing **`DATABASE_URL`** or **`JWT_SECRET`** on the **lashkoi-api** Vercel project, or a failed deploy). Fix env → redeploy API → hard-refresh the map.
+
+If the map shows **“Some data could not load”** locally, the browser is not reaching **this** API: another app may be using the same `PORT` (e.g. a different Nest project on `:3001`). Set a free port in `PORT`, match `VITE_API_BASE_URL` in `apps/web/.env`, restart both dev servers, and verify `http://localhost:<PORT>/api/v1/incident-types?lang=en` returns JSON (not 404).
 
 ---
 

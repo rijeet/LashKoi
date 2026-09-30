@@ -2,12 +2,17 @@
 node_modules/
 .pnp.*
 
-# Env (never commit secrets)
+# Env (never commit secrets) — templates: apps/*/.env.example
 .env
+.env.*
+!.env.example
 .env.local
 .env.*.local
 apps/api/.env.local
 apps/web/.env
+
+# Vercel CLI (vercel link)
+.vercel/
 
 # Build
 dist/

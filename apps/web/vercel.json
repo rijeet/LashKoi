@@ -1,9 +1,18 @@
 {
-  "buildCommand": "npm run build",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm install --prefix ../..",
+  "buildCommand": "npm run build --workspace=@lashkoi/web --prefix ../..",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/robots.txt", "destination": "/api/robots" },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    },
     {
       "source": "/:lang(en|bn)/incidents/:slug",
       "destination": "/api/incident-meta?lang=:lang&slug=:slug"
@@ -11,6 +20,26 @@
     {
       "source": "/((?!api/|assets/|geo/|logo\\.svg|favicon).*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/geo/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }

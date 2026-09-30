@@ -10,7 +10,10 @@ export class ApiConfigService {
   }
 
   get corsOrigins(): string[] {
-    const raw = this.config.get<string>('CORS_ORIGINS', 'http://localhost:5173');
+    const raw = this.config.get<string>(
+      'CORS_ORIGINS',
+      'http://localhost:5173,http://127.0.0.1:5173',
+    );
     return raw.split(',').map((s) => s.trim()).filter(Boolean);
   }
 

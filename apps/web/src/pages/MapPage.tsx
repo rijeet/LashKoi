@@ -249,8 +249,18 @@ export function MapPage() {
         />
       )}
       {incidentsQuery.isError && (
-        <div className="pointer-events-auto absolute bottom-4 left-4 z-[500] rounded-md bg-red-950/90 px-3 py-2 text-sm text-red-100">
-          {t('map.loadError')}
+        <div
+          className="pointer-events-auto absolute bottom-4 left-4 z-[500] flex max-w-sm flex-wrap items-center gap-2 rounded-md bg-red-950/90 px-3 py-2 text-sm text-red-100"
+        >
+          <span>{t('map.loadError')}</span>
+          <button
+            type="button"
+            onClick={() => incidentsQuery.refetch()}
+            disabled={incidentsQuery.isFetching}
+            className="rounded border border-red-400/40 px-2 py-0.5 text-xs font-medium text-red-50 hover:bg-red-900/80 disabled:opacity-50"
+          >
+            {t('map.retry')}
+          </button>
         </div>
       )}
       <Suspense

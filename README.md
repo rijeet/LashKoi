@@ -49,3 +49,7 @@ Clear splash: `sessionStorage.removeItem('lk_splash_seen')` in browser devtools.
 ## Reference assets (not app runtime)
 
 Offline geo sources, Wikipedia HTML dumps, and HTML prototypes live under [`reference/`](reference/README.md). Generated map data is in `apps/web/public/geo/`.
+
+## Production deploy
+
+**Frontend (Vercel)** + **backend (Railway/Render/etc.)** — step-by-step env, `vercel.json`, and CORS: [docs/DEPLOY.md](docs/DEPLOY.md).

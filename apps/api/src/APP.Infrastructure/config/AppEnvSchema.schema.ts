@@ -9,7 +9,9 @@ export const appEnvSchema = Joi.object({
   JWT_REFRESH_TTL: Joi.string().default('7d'),
   UPSTASH_REDIS_REST_URL: Joi.string().uri().optional().allow(''),
   UPSTASH_REDIS_REST_TOKEN: Joi.string().optional().allow(''),
-  CORS_ORIGINS: Joi.string().default('http://localhost:5173'),
+  CORS_ORIGINS: Joi.string().default(
+    'http://localhost:5173,http://127.0.0.1:5173',
+  ),
   PUBLIC_SITE_URL: Joi.string().uri().default('http://localhost:5173'),
   SITEMAP_BASE_URL: Joi.string().uri().default('http://localhost:5173'),
   ADMIN_EMAIL: Joi.string().email().optional(),

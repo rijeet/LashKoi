@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { ApiError } from '@/services/api-client';
 
@@ -7,6 +8,7 @@ export function AdminLoginPage() {
   const { user, login, bootstrapping } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const navigate = useNavigate();
@@ -57,14 +59,28 @@ export function AdminLoginPage() {
         </label>
         <label className="block text-sm">
           <span className="text-slate-400">Password</span>
-          <input
-            type="password"
-            autoComplete="current-password"
-            required
-            className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="relative mt-1">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
+              className="w-full rounded-md border border-slate-700 bg-slate-950 py-2 pl-3 pr-10"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-300"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" aria-hidden />
+              ) : (
+                <Eye className="h-4 w-4" aria-hidden />
+              )}
+            </button>
+          </div>
         </label>
         <button
           type="submit"

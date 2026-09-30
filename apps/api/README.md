@@ -27,3 +27,11 @@ NestJS backend (scol-style layers): PostGIS, JWT + refresh rotation, public inci
 - Base: `/api/v1`
 - Swagger: `/swagger`
 - Health (raw): `/health`
+
+## Production deploy (Vercel)
+
+**Root Directory:** `apps/api` — [`vercel.json`](vercel.json) + serverless entry [`api/index.ts`](api/index.ts).
+
+Pair with a second Vercel project for `apps/web`. Full env and URLs: [../../docs/DEPLOY.md](../../docs/DEPLOY.md).
+
+Railway/Render (long-running) is still supported via `npm run start:prod`.

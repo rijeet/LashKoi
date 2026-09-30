@@ -80,7 +80,7 @@ export function IncidentOverlayPanel({
       </aside>
       {/* Desktop panel */}
       <aside
-        className="pointer-events-auto absolute top-14 right-4 bottom-4 z-[500] hidden w-[420px] max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-700/80 bg-slate-900/90 shadow-2xl backdrop-blur-md md:top-16 md:flex"
+        className="pointer-events-auto absolute top-14 right-4 z-[500] hidden h-auto max-h-[calc(100dvh-3.5rem)] w-[420px] max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-700/80 bg-slate-900/90 shadow-2xl backdrop-blur-md md:top-16 md:flex"
       >
         <OverlayBody
           incident={incident}
@@ -149,7 +149,7 @@ function OverlayBody({
           <X className="h-5 w-5" />
         </button>
       </div>
-      <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
         <div>
           <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
             {incident.source && (

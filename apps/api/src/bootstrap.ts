@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express';
 import { ValidationPipe } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -24,8 +26,17 @@ import {
 import { ErrorResponseDto, ErrorBodyDto } from '@shared/dtos/common/ErrorResponseDto';
 import { SuccessResponseDto } from '@shared/dtos/common/SuccessResponseDto';
 
+const expressApp = express();
+
+/** Underlying Express app (Vercel serverless + `main.ts` listen). */
+export function getExpressApp() {
+  return expressApp;
+}
+
 export async function createNestApp(): Promise<INestApplication> {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp), {
+    bufferLogs: true,
+  });
   app.useLogger(app.get(Logger));
 
   const apiConfig = app.get(ApiConfigService);

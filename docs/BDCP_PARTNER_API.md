@@ -128,17 +128,19 @@ Query params:
 
 ## 5. Partner app env (on [bdcp.vercel.app](https://bdcp.vercel.app/) repo)
 
-In the **BDCP** Vercel project, only add these if you add a LashKoi-powered section (map strip, secondary feed, etc.). BDCP’s default tracker keeps using the BDCP API.
+**Implemented:** BDCP home page shows a **LashKoi** block when env is set (`apps/web/src/lib/lashkoi-api.ts`, `LashKoiTrackerSection` on `[locale]/page.tsx`). BDCP’s own tracker above it still uses the BDCP API.
+
+In the **BDCP** Vercel **web** project, add:
 
 ```env
-# Optional — LashKoi as a second data source
-NEXT_PUBLIC_LASHKOI_API_URL=https://api.lashkoi.example.com/api/v1
-NEXT_PUBLIC_LASHKOI_SITE_URL=https://your-lashkoi-web.vercel.app
+NEXT_PUBLIC_LASHKOI_API_URL=https://lashkoi-api.vercel.app/api/v1
+NEXT_PUBLIC_LASHKOI_SITE_URL=https://lash-koi.vercel.app
 
-# If reusing BDCP’s existing accountability env names for the same widget:
-NEXT_PUBLIC_ACCOUNTABILITY_API_URL=https://api.lashkoi.example.com/api/v1
-NEXT_PUBLIC_ACCOUNTABILITY_SITE_URL=https://your-lashkoi-web.vercel.app
+# Optional server-only (if GOVERNANCE_PARTNER_KEY is set on LashKoi API):
+# LASHKOI_PARTNER_KEY=same-secret-as-lashkoi-api
 ```
+
+Aliases still work: `NEXT_PUBLIC_ACCOUNTABILITY_API_URL` / `NEXT_PUBLIC_ACCOUNTABILITY_SITE_URL`.
 
 Example loader (Next.js):
 

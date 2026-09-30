@@ -37,6 +37,12 @@ npm run phase2:smoke   # API must be running
 
 Phase 2 checklist: [docs/PHASE2_SIGNOFF.md](docs/PHASE2_SIGNOFF.md)
 
+## Local news harvest → bulk import (drafts)
+
+Full guide: **[docs/bulk_import_harvest.md](docs/bulk_import_harvest.md)** — JSON bulk, admin UI, harvest CLI, Ollama translate, troubleshooting.
+
+Quick: [`tools/incident-harvest`](tools/incident-harvest/README.md), `npm run harvest:env`, `npm run api:migrate`, then `npm run harvest:import:yes -- config/bulk-incidents.example.json`.
+
 Clear splash: `sessionStorage.removeItem('lk_splash_seen')` in browser devtools.
 
 ## Phase 0 quick start

@@ -13,6 +13,8 @@ import { Incidents } from '@entity/entities/Incidents.entity';
 import { IncidentMedia } from '@entity/entities/IncidentMedia.entity';
 import { FeatureBanners } from '@entity/entities/FeatureBanners.entity';
 import { IncidentAudit } from '@entity/entities/IncidentAudit.entity';
+import { ImportBatches } from '@entity/entities/ImportBatches.entity';
+import { ImportProfiles } from '@entity/entities/ImportProfiles.entity';
 import { JwtService } from '@infra/security/JwtService.service';
 import { PasswordHasherService } from '@infra/security/PasswordHasher.service';
 import { RevocationRegistryService } from '@infra/security/RevocationRegistry.service';
@@ -33,6 +35,8 @@ const entities = [
   IncidentMedia,
   FeatureBanners,
   IncidentAudit,
+  ImportBatches,
+  ImportProfiles,
 ];
 
 @Global()

@@ -1,0 +1,40 @@
+types:
+  extortion:
+    include:
+      - চাঁদাবাজি
+      - চাঁদা দাবি
+      - extortion
+    exclude:
+      - মতামত
+      - সম্পাদকীয়
+      - editorial
+      - opinion
+  dengue:
+    include:
+      - ডেঙ্গু
+      - ডেঙ্গুতে মৃত্যু
+      - dengue
+    aggregate:
+      - সারাদেশে
+      - ২৪ ঘণ্টায়
+      - nationwide
+  measles:
+    include:
+      - হাম
+      - হামে শিশু
+      - measles
+    exclude: []
+  kidnap:
+    include:
+      - অপহরণ
+      - অপহৃত
+      - kidnap
+      - abduct
+    exclude: []
+  body_found:
+    include:
+      - লাশ উদ্ধার
+      - মরদেহ উদ্ধার
+      - body found
+      - body recovered
+    exclude: []

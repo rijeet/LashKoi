@@ -31,6 +31,12 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
+# Local news harvest (never commit scraped output)
+tools/incident-harvest/output/
+tools/incident-harvest/input/*.local.*
+tools/incident-harvest/.cache/
+tools/incident-harvest/.env
+
 # Cache
 .cache/
 *.local

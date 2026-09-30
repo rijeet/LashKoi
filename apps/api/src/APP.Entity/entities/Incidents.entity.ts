@@ -103,6 +103,15 @@ export class Incidents {
   @Column({ name: 'deleted_at', type: 'timestamptz', nullable: true })
   deletedAt?: Date | null;
 
+  @Column({ name: 'external_id', type: 'varchar', length: 80, nullable: true })
+  externalId?: string | null;
+
+  @Column({ name: 'location_confirmed', type: 'boolean', default: true })
+  locationConfirmed!: boolean;
+
+  @Column({ name: 'import_batch_id', type: 'uuid', nullable: true })
+  importBatchId?: string | null;
+
   @ManyToOne(() => IncidentTypes, (t) => t.incidents)
   @JoinColumn({ name: 'type_id' })
   type!: IncidentTypes;

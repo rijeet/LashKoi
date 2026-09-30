@@ -1,0 +1,15 @@
+{
+  "incidents": [
+    {
+      "type": "dengue",
+      "titleBn": "ফরিদপুরে ডেঙ্গুতে ৬ জনের মৃত্যু",
+      "summaryBn": "স্বাস্থ্য কর্তৃপক্ষ জানিয়েছে গত ২৪ ঘণ্টায় জেলায় ছয়জনের মৃত্যু হয়েছে।",
+      "placeNameBn": "ফরিদপুর",
+      "placeHint": "ফরিদপুরে ডেঙ্গুতে ৬ জনের মৃত্যু",
+      "caseCount": 6,
+      "sourceLabel": "Prothom Alo",
+      "sourceUrl": "https://www.prothomalo.com/bangladesh/qs0jtq2xn0",
+      "occurredAt": "2026-09-29T10:00:00.000Z"
+    }
+  ]
+}

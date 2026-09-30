@@ -132,6 +132,7 @@ export interface AdminIncidentListItemDto {
   occurredAt: string;
   updatedAt: string;
   publishedAt: string | null;
+  locationConfirmed?: boolean;
 }
 
 export interface AdminIncidentListDto {

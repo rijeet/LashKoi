@@ -49,6 +49,18 @@
       "contentWarning": false,
       "sortOrder": 4,
       "isActive": true
+    },
+    {
+      "code": "body_found",
+      "labelEn": "Body found",
+      "labelBn": "লাশ উদ্ধার",
+      "iconKey": "Skull",
+      "iconUrl": null,
+      "markerColor": "#78716c",
+      "isHealth": false,
+      "contentWarning": true,
+      "sortOrder": 5,
+      "isActive": true
     }
   ]
 }

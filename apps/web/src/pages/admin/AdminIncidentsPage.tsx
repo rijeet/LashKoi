@@ -1,22 +1,35 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { listAdminIncidents } from '@/services/admin-incidents';
 import { queryKeys } from '@/lib/query-keys';
 
 export function AdminIncidentsPage() {
+  const [params] = useSearchParams();
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('');
+  const locationConfirmed = params.get('locationConfirmed') ?? '';
 
   const listQuery = useQuery({
-    queryKey: queryKeys.adminIncidents({ q, status }),
-    queryFn: () => listAdminIncidents({ q: q || undefined, status: status || undefined }),
+    queryKey: queryKeys.adminIncidents({ q, status, locationConfirmed }),
+    queryFn: () =>
+      listAdminIncidents({
+        q: q || undefined,
+        status: status || undefined,
+        locationConfirmed: locationConfirmed || undefined,
+      }),
   });
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-end gap-3">
         <h1 className="flex-1 text-2xl font-semibold">Incidents</h1>
+        <Link
+          to="/admin/incidents/import"
+          className="rounded-md border border-slate-600 px-3 py-2 text-sm hover:bg-slate-900"
+        >
+          Bulk import
+        </Link>
         <Link
           to="/admin/incidents/new"
           className="rounded-md bg-cyan-600 px-3 py-2 text-sm font-medium text-white hover:bg-cyan-500"
@@ -43,6 +56,16 @@ export function AdminIncidentsPage() {
           <option value="published">Published</option>
           <option value="archived">Archived</option>
         </select>
+        <Link
+          to={locationConfirmed === 'false' ? '/admin' : '/admin?locationConfirmed=false'}
+          className={`rounded-md border px-3 py-2 text-sm ${
+            locationConfirmed === 'false'
+              ? 'border-cyan-500 text-cyan-300'
+              : 'border-slate-700 text-slate-300'
+          }`}
+        >
+          Needs location
+        </Link>
       </div>
 
       {listQuery.isError && (
@@ -57,6 +80,7 @@ export function AdminIncidentsPage() {
               <th className="px-3 py-2">Title</th>
               <th className="px-3 py-2">Type</th>
               <th className="px-3 py-2">Status</th>
+              <th className="px-3 py-2">Location</th>
               <th className="px-3 py-2">Updated</th>
             </tr>
           </thead>
@@ -69,6 +93,13 @@ export function AdminIncidentsPage() {
                 <td className="px-3 py-2">{row.titleEn}</td>
                 <td className="px-3 py-2">{row.type}</td>
                 <td className="px-3 py-2 capitalize">{row.status}</td>
+                <td className="px-3 py-2">
+                  {row.locationConfirmed === false ? (
+                    <span className="text-amber-400">Needs map</span>
+                  ) : (
+                    <span className="text-slate-500">OK</span>
+                  )}
+                </td>
                 <td className="px-3 py-2 text-slate-500">
                   {new Date(row.updatedAt).toLocaleString()}
                 </td>

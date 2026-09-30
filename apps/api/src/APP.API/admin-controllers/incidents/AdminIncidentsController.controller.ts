@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -20,17 +21,42 @@ import { JwtAuthGuard } from '@api/common/guards/JwtAuthGuard.guard';
 import { CurrentUser } from '@api/common/decorators/CurrentUser.decorator';
 import type { ICurrentUser } from '@shared/interfaces/domain/ICurrentUser.interface';
 import { IncidentAdminService } from '@bll/services/incidents/IncidentAdminService';
+import { IncidentBulkImportService } from '@bll/services/incidents/import/IncidentBulkImportService';
 import {
   CreateIncidentRequestDto,
   PatchIncidentRequestDto,
 } from '@shared/dtos/incidents/CreateIncidentRequestDto';
+import { BulkImportRequestDto } from '@shared/dtos/incidents/BulkImportRequestDto';
 
 @ApiTags('admin-incidents')
 @Controller('admin/incidents')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class AdminIncidentsController {
-  constructor(private readonly incidents: IncidentAdminService) {}
+  constructor(
+    private readonly incidents: IncidentAdminService,
+    private readonly bulkImport: IncidentBulkImportService,
+  ) {}
+
+  @Post('bulk/normalize')
+  @ApiOperation({ summary: 'Normalize bulk JSON for import (no writes)' })
+  normalizeBulk(@Body() body: BulkImportRequestDto) {
+    return this.bulkImport.normalizePayload(body);
+  }
+
+  @Post('bulk')
+  @ApiOperation({ summary: 'Import incidents as drafts (bulk)' })
+  importBulk(
+    @Body() body: BulkImportRequestDto,
+    @CurrentUser() user: ICurrentUser,
+    @Query('dryRun') dryRun?: string,
+    @Headers('idempotency-key') idempotencyKey?: string,
+  ) {
+    return this.bulkImport.importBatch(body, user, {
+      dryRun: dryRun === 'true' || dryRun === '1',
+      idempotencyKey,
+    });
+  }
 
   @Get()
   @ApiOperation({ summary: 'List incidents (admin)' })
@@ -41,12 +67,16 @@ export class AdminIncidentsController {
     @Query('q') q?: string,
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
+    @Query('locationConfirmed') locationConfirmed?: string,
+    @Query('importBatchId') importBatchId?: string,
   ) {
     return this.incidents.list({
       status,
       types,
       division,
       q,
+      locationConfirmed,
+      importBatchId,
       page: page ? Number(page) : undefined,
       pageSize: pageSize ? Number(pageSize) : undefined,
     });

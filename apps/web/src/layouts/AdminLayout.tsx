@@ -28,6 +28,9 @@ export function AdminLayout() {
           <Link to="/admin/incidents/new" className="text-sm text-slate-300 hover:text-white">
             New incident
           </Link>
+          <Link to="/admin/incidents/import" className="text-sm text-slate-300 hover:text-white">
+            Bulk import
+          </Link>
           <Link to="/admin/banners" className="text-sm text-slate-300 hover:text-white">
             Banners
           </Link>

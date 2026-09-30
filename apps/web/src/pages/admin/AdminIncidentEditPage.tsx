@@ -174,7 +174,12 @@ export function AdminIncidentEditPage() {
         {record.status !== 'published' && (
           <button
             type="button"
-            disabled={publish.isPending}
+            disabled={publish.isPending || record.locationConfirmed === false}
+            title={
+              record.locationConfirmed === false
+                ? 'Set and save map location inside the district first'
+                : undefined
+            }
             onClick={() => publish.mutate()}
             className="rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-500 disabled:opacity-50"
           >

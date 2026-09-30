@@ -6,6 +6,8 @@ export type AdminIncidentListQuery = {
   types?: string;
   division?: string;
   q?: string;
+  locationConfirmed?: string;
+  importBatchId?: string;
   page?: number;
   pageSize?: number;
 };
@@ -42,6 +44,8 @@ export function listAdminIncidents(query: AdminIncidentListQuery = {}) {
       types: query.types,
       division: query.division,
       q: query.q,
+      locationConfirmed: query.locationConfirmed,
+      importBatchId: query.importBatchId,
       page: query.page,
       pageSize: query.pageSize,
     },

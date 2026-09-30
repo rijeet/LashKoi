@@ -35,6 +35,11 @@ const AdminAnalyticsPage = lazy(() =>
     default: m.AdminAnalyticsPage,
   })),
 );
+const AdminBulkImportPage = lazy(() =>
+  import('@/pages/admin/AdminBulkImportPage').then((m) => ({
+    default: m.AdminBulkImportPage,
+  })),
+);
 
 const adminFallback = <p className="p-8 text-slate-400">Loading admin…</p>;
 
@@ -71,6 +76,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={adminFallback}>
             <AdminIncidentsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'incidents/import',
+        element: (
+          <Suspense fallback={adminFallback}>
+            <AdminBulkImportPage />
           </Suspense>
         ),
       },

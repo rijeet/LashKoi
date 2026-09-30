@@ -17,6 +17,14 @@ import type { Incidents } from '@entity/entities/Incidents.entity';
 
 @Injectable()
 export class IncidentAdminService {
+  /** TypeORM geography columns expect GeoJSON Point, not WKT strings. */
+  private geoPoint(lng: number, lat: number): string {
+    return {
+      type: 'Point',
+      coordinates: [lng, lat],
+    } as unknown as string;
+  }
+
   private readonly slugService = new SlugService();
   private readonly mediaValidation = new MediaValidationService();
   private readonly htmlSanitize = new HtmlSanitizeService();
@@ -64,7 +72,7 @@ export class IncidentAdminService {
       bodyHtml: this.htmlSanitize.sanitize(dto.bodyHtml as string),
       placeNameEn: (dto.placeNameEn as string) ?? null,
       placeNameBn: (dto.placeNameBn as string) ?? null,
-      location: 'SRID=4326;POINT(0 0)',
+      location: this.geoPoint(location.lng, location.lat),
       divisionPcode: String(dto.divisionPcode),
       districtPcode: String(dto.districtPcode),
       upazilaPcode: (dto.upazilaPcode as string) ?? null,
@@ -79,10 +87,6 @@ export class IncidentAdminService {
     });
 
     const saved = await this.db.incidents.save(incident);
-    await this.db.incidents.query(
-      `UPDATE incidents SET location = ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography WHERE id = $3`,
-      [location.lng, location.lat, saved.id],
-    );
     await this.upsertMedia(saved.id, dto.media as Record<string, string | null>);
     await this.audit.log(saved.id, 'created', user, {
       refCode: saved.refCode,
@@ -91,6 +95,85 @@ export class IncidentAdminService {
       status: saved.status,
     });
     return this.getAdminRecord(saved.id);
+  }
+
+  async createDraftFromImport(
+    dto: Record<string, unknown>,
+    user: ICurrentUser,
+    externalId: string,
+    importBatchId: string | null,
+  ): Promise<string> {
+    const type = await this.db.incidentTypes.findOne({
+      where: { code: String(dto.type) },
+    });
+    if (!type) {
+      throw new ApiHttpException(
+        HttpStatus.BAD_REQUEST,
+        'Invalid type',
+        ErrorCode.VALIDATION_ERROR,
+      );
+    }
+    await this.validatePcodeChain(dto);
+    const location = dto.location as { lat: number; lng: number };
+    const locationConfirmed = Boolean(dto.locationConfirmed);
+    if (locationConfirmed) {
+      await this.districtBoundaries.assertPointInDistrict(
+        location.lat,
+        location.lng,
+        String(dto.districtPcode),
+      );
+    }
+    const titleEn = String(dto.titleEn ?? '');
+    const baseSlug = this.slugService.slugify(titleEn);
+    const slug = await this.slugService.ensureUnique(baseSlug, async (s) =>
+      Boolean(await this.db.incidents.exist({ where: { slug: s } })),
+    );
+    const year = new Date().getFullYear();
+    const seq = (await this.db.incidents.count()) + 1;
+    const incident = this.db.incidents.create({
+      refCode: this.refCode.format(year, seq),
+      slug,
+      typeId: type.id,
+      createdById: user.userId,
+      titleEn,
+      titleBn: (dto.titleBn as string) ?? null,
+      summaryEn: String(dto.summaryEn ?? ''),
+      summaryBn: (dto.summaryBn as string) ?? null,
+      bodyHtml: null,
+      placeNameEn: (dto.placeNameEn as string) ?? null,
+      placeNameBn: (dto.placeNameBn as string) ?? null,
+      location: this.geoPoint(location.lng, location.lat),
+      divisionPcode: String(dto.divisionPcode),
+      districtPcode: String(dto.districtPcode),
+      upazilaPcode: (dto.upazilaPcode as string) ?? null,
+      unionPcode: (dto.unionPcode as string) ?? null,
+      sourceLabel: String(dto.sourceLabel ?? 'News import'),
+      sourceUrl: (dto.sourceUrl as string) ?? null,
+      bannerCaptionEn: null,
+      bannerCaptionBn: null,
+      caseCount: (dto.caseCount as number) ?? null,
+      status: IncidentStatus.DRAFT,
+      occurredAt: new Date(String(dto.occurredAt)),
+      externalId,
+      locationConfirmed,
+      importBatchId,
+    });
+    const saved = await this.db.incidents.save(incident);
+    if (dto.media) {
+      await this.upsertMedia(
+        saved.id,
+        dto.media as Record<string, string | null>,
+      );
+    }
+    await this.audit.log(saved.id, 'created', user, {
+      refCode: saved.refCode,
+      slug: saved.slug,
+      type: String(dto.type),
+      status: saved.status,
+      import: true,
+      externalId,
+    });
+    return saved.id;
   }
 
   listAudit(incidentId: string) {
@@ -102,6 +185,8 @@ export class IncidentAdminService {
     types?: string;
     division?: string;
     q?: string;
+    locationConfirmed?: string;
+    importBatchId?: string;
     page?: number;
     pageSize?: number;
   }) {
@@ -129,6 +214,14 @@ export class IncidentAdminService {
         pattern: `%${term}%`,
       });
     }
+    if (params.locationConfirmed === 'false') {
+      qb.andWhere('i.locationConfirmed = false');
+    }
+    if (params.importBatchId) {
+      qb.andWhere('i.importBatchId = :importBatchId', {
+        importBatchId: params.importBatchId,
+      });
+    }
 
     qb.orderBy('i.updatedAt', 'DESC');
     qb.skip((page - 1) * pageSize).take(pageSize);
@@ -147,6 +240,8 @@ export class IncidentAdminService {
         occurredAt: incident.occurredAt,
         updatedAt: incident.updatedAt,
         publishedAt: incident.publishedAt,
+        locationConfirmed: incident.locationConfirmed,
+        importBatchId: incident.importBatchId ?? null,
       })),
       total,
       page,
@@ -217,6 +312,8 @@ export class IncidentAdminService {
         location.lng,
         incident.districtPcode,
       );
+      incident.locationConfirmed = true;
+      await this.db.incidents.save(incident);
     }
     if (dto.media) {
       await this.upsertMedia(id, dto.media as Record<string, string | null>);
@@ -238,6 +335,13 @@ export class IncidentAdminService {
     });
     if (!incident || incident.deletedAt) {
       throw new ApiHttpException(HttpStatus.NOT_FOUND, 'Not found', ErrorCode.NOT_FOUND);
+    }
+    if (!incident.locationConfirmed) {
+      throw new ApiHttpException(
+        HttpStatus.BAD_REQUEST,
+        'Confirm map location before publishing',
+        ErrorCode.VALIDATION_ERROR,
+      );
     }
     const coords = await this.readLocation(id);
     if (coords) {
@@ -337,6 +441,9 @@ export class IncidentAdminService {
       occurredAt: incident.occurredAt,
       publishedAt: incident.publishedAt,
       updatedAt: incident.updatedAt,
+      locationConfirmed: incident.locationConfirmed,
+      externalId: incident.externalId,
+      importBatchId: incident.importBatchId,
       media,
     };
   }

@@ -1,4 +1,5 @@
 import { Pause, Play } from 'lucide-react';
+import { MapDatePicker } from '@/components/map/MapDatePicker';
 import type { BoundaryAreaDto, IncidentTypeDto, Lang } from '@/types/api';
 
 type Props = {
@@ -10,8 +11,10 @@ type Props = {
   selectedType: string;
   selectedDivision: string;
   selectedDistrict: string;
+  selectedDate: string;
   search: string;
   onTypeChange: (v: string) => void;
+  onDateChange: (v: string) => void;
   onDivisionChange: (v: string) => void;
   onDistrictChange: (v: string) => void;
   onSearchChange: (v: string) => void;
@@ -28,6 +31,10 @@ type Props = {
     langBn: string;
     storytellerPlay: string;
     storytellerPause: string;
+    allDates: string;
+    today: string;
+    clearDate: string;
+    incidentsOnDay: string;
   };
 };
 
@@ -39,8 +46,10 @@ export function MapHeader({
   selectedType,
   selectedDivision,
   selectedDistrict,
+  selectedDate,
   search,
   onTypeChange,
+  onDateChange,
   onDivisionChange,
   onDistrictChange,
   onSearchChange,
@@ -86,6 +95,19 @@ export function MapHeader({
           <option key={d.pcode} value={d.pcode}>{d.name}</option>
         ))}
       </select>
+      <MapDatePicker
+        lang={lang}
+        types={selectedType || undefined}
+        division={selectedDivision || undefined}
+        selectedDate={selectedDate}
+        onDateChange={onDateChange}
+        labels={{
+          allDates: labels.allDates,
+          today: labels.today,
+          clear: labels.clearDate,
+          incidentsOnDay: labels.incidentsOnDay,
+        }}
+      />
       <input
         type="search"
         value={search}

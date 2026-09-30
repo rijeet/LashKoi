@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router';
 
@@ -21,6 +21,7 @@ import type { LatLngTuple } from 'leaflet';
 import { useT } from '@/i18n/useT';
 import { LANG_STORAGE_KEY } from '@/lib/constants';
 import { toLeafletLatLng } from '@/lib/mappers';
+import { formatDayLabel, isValidDay } from '@/lib/dhaka-date';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { getHealthDistricts } from '@/services/get-health-districts';
 import { HealthChoroplethLegend } from '@/components/map/HealthChoroplethLegend';
@@ -49,7 +50,14 @@ export function MapPage() {
   const district = params.get('district') ?? '';
   const incidentSlug = params.get('incident') ?? '';
   const q = params.get('q') ?? '';
+  const rawDate = params.get('date') ?? '';
+  const dateFilter = rawDate && isValidDay(rawDate) ? rawDate : '';
   const debouncedQ = useDebouncedValue(q, 400);
+
+  useEffect(() => {
+    if (dateFilter) setStorytellerPlaying(false);
+  }, [dateFilter]);
+
   const healthChoroplethType =
     typeFilter === 'dengue' || typeFilter === 'measles' ? typeFilter : null;
 
@@ -70,6 +78,7 @@ export function MapPage() {
       types: typeFilter || undefined,
       division: division || undefined,
       district: district || undefined,
+      date: dateFilter || undefined,
       q: debouncedQ || undefined,
     }),
     queryFn: () =>
@@ -78,6 +87,7 @@ export function MapPage() {
         types: typeFilter || undefined,
         division: division || undefined,
         district: district || undefined,
+        date: dateFilter || undefined,
         q: debouncedQ || undefined,
       }),
     staleTime: 30 * 1000,
@@ -201,6 +211,20 @@ export function MapPage() {
     [incidentsQuery.data],
   );
 
+  const showNoIncidentsOnDay =
+    Boolean(dateFilter) &&
+    !incidentsQuery.isLoading &&
+    !incidentsQuery.isError &&
+    (incidentsQuery.data?.features.length ?? 0) === 0;
+
+  const onDateChange = useCallback(
+    (value: string) => {
+      if (value) setStorytellerPlaying(false);
+      updateParam('date', value);
+    },
+    [updateParam],
+  );
+
   return (
     <div className="relative h-full w-full">
       <MapHeader
@@ -212,8 +236,10 @@ export function MapPage() {
         selectedType={typeFilter}
         selectedDivision={division}
         selectedDistrict={district}
+        selectedDate={dateFilter}
         search={q}
         onTypeChange={(v) => updateParam('type', v)}
+        onDateChange={onDateChange}
         onDivisionChange={(v) => {
           updateParams({ division: v, district: '' });
         }}
@@ -226,7 +252,13 @@ export function MapPage() {
         }}
         storytellerPlaying={storytellerPlaying}
         storytellerProgress={storyteller.slideProgress}
-        onStorytellerToggle={() => setStorytellerPlaying((p) => !p)}
+        onStorytellerToggle={() => {
+          setStorytellerPlaying((p) => {
+            const next = !p;
+            if (next) updateParam('date', '');
+            return next;
+          });
+        }}
         labels={{
           search: t('header.search'),
           allTypes: t('header.allTypes'),
@@ -236,6 +268,10 @@ export function MapPage() {
           langBn: t('lang.bn'),
           storytellerPlay: t('storyteller.play'),
           storytellerPause: t('storyteller.pause'),
+          allDates: t('header.allDates'),
+          today: t('header.today'),
+          clearDate: t('header.clearDate'),
+          incidentsOnDay: t('header.incidentsOnDay'),
         }}
       />
       <BreakingBannerStrip lang={lang} />
@@ -247,6 +283,16 @@ export function MapPage() {
           maxTotal={healthDistrictsQuery.data.maxTotal}
           days={healthDistrictsQuery.data.days}
         />
+      )}
+      {showNoIncidentsOnDay && (
+        <div
+          className="pointer-events-auto absolute bottom-4 left-4 z-[500] max-w-sm rounded-md border border-slate-600/80 bg-slate-900/90 px-3 py-2 text-sm text-slate-200"
+        >
+          {t('map.noIncidentsOnDay').replace(
+            '{day}',
+            formatDayLabel(dateFilter, lang),
+          )}
+        </div>
       )}
       {incidentsQuery.isError && (
         <div

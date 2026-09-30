@@ -19,4 +19,5 @@ export const appEnvSchema = Joi.object({
   SWAGGER_ENABLED: Joi.string().default('true'),
   ADMIN_POINTS_GEOJSON: Joi.string().optional(),
   GOVERNANCE_PARTNER_KEY: Joi.string().optional().allow(''),
+  ADMIN_BULK_IMPORT_ENABLED: Joi.string().optional().allow(''),
 });

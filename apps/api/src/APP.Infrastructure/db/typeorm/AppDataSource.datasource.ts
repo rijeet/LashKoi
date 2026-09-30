@@ -11,6 +11,8 @@ import { Incidents } from '@entity/entities/Incidents.entity';
 import { IncidentMedia } from '@entity/entities/IncidentMedia.entity';
 import { FeatureBanners } from '@entity/entities/FeatureBanners.entity';
 import { IncidentAudit } from '@entity/entities/IncidentAudit.entity';
+import { ImportBatches } from '@entity/entities/ImportBatches.entity';
+import { ImportProfiles } from '@entity/entities/ImportProfiles.entity';
 
 const projectRoot = path.resolve(__dirname, '../../../..');
 const envLocalPath = path.join(projectRoot, '.env.local');
@@ -42,6 +44,8 @@ const AppDataSource = new DataSource({
     IncidentMedia,
     FeatureBanners,
     IncidentAudit,
+    ImportBatches,
+    ImportProfiles,
   ],
   migrations: [migrationPath],
 });

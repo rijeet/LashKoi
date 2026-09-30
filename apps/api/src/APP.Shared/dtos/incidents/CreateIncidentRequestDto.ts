@@ -43,7 +43,10 @@ export class IncidentMediaDto {
 }
 
 export class CreateIncidentRequestDto {
-  @ApiProperty({ example: 'extortion', enum: ['extortion', 'measles', 'kidnap', 'dengue'] })
+  @ApiProperty({
+    example: 'extortion',
+    enum: ['extortion', 'measles', 'kidnap', 'dengue', 'body_found'],
+  })
   @IsString()
   type!: string;
 

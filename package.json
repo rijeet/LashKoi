@@ -4,7 +4,8 @@
   "description": "Bangladesh incident map — monorepo (apps/api, apps/web)",
   "workspaces": [
     "apps/api",
-    "apps/web"
+    "apps/web",
+    "tools/incident-harvest"
   ],
   "scripts": {
     "phase0:check": "node scripts/phase0-check-env.mjs",
@@ -20,12 +21,23 @@
     "web:geo:dhaka-unions": "node scripts/extract-dhaka-union-polygons.mjs",
     "api:seed:demo": "npm run seed:demo --workspace=@lashkoi/api",
     "phase2:smoke": "node scripts/phase2-smoke.mjs",
-    "phase2:setup": "npm run api:migrate && npm run api:seed && npm run api:seed:demo"
+    "phase2:setup": "npm run api:migrate && npm run api:seed && npm run api:seed:demo",
+    "harvest:export-areas": "tsx tools/incident-harvest/src/cli.ts export-areas",
+    "harvest:discover": "tsx tools/incident-harvest/src/cli.ts discover",
+    "harvest:scrape": "tsx tools/incident-harvest/src/cli.ts scrape",
+    "harvest:run": "tsx tools/incident-harvest/src/cli.ts run",
+    "harvest:validate": "tsx tools/incident-harvest/src/cli.ts validate",
+    "harvest:translate": "tsx tools/incident-harvest/src/cli.ts translate",
+    "harvest:import": "tsx tools/incident-harvest/src/cli.ts import",
+    "harvest:import:yes": "tsx tools/incident-harvest/src/cli.ts import --yes",
+    "harvest:env": "node tools/incident-harvest/setup-env-from-api.mjs",
+    "api:publish-import-drafts": "node scripts/publish-import-drafts.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "@indic-transliteration/sanscript": "^1.3.3"
+    "@indic-transliteration/sanscript": "^1.3.3",
+    "tsx": "^4.19.3"
   }
 }

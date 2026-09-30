@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'leaflet/dist/leaflet.css';
+@import 'react-day-picker/style.css';
 
 @theme {
   --color-lk-accent: #22d3ee;
@@ -241,4 +242,27 @@ body,
   .lk-marker {
     animation: none;
   }
+}
+
+.lashkoi-rdp {
+  --rdp-accent-color: #0891b2;
+  --rdp-accent-background-color: rgb(8 145 178 / 0.2);
+  --rdp-day-height: 2.25rem;
+  --rdp-day-width: 2.25rem;
+}
+
+.lashkoi-rdp .rdp-day_has-incidents button {
+  position: relative;
+}
+
+.lashkoi-rdp .rdp-day_has-incidents button::after {
+  content: '';
+  position: absolute;
+  bottom: 0.2rem;
+  left: 50%;
+  width: 0.25rem;
+  height: 0.25rem;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background-color: #22d3ee;
 }

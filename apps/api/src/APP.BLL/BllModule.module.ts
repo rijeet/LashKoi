@@ -12,6 +12,8 @@ import { DistrictBoundaryValidationService } from '@bll/services/boundaries/Dist
 import { IncidentAuditService } from '@bll/services/incidents/IncidentAuditService';
 import { GovernanceTrackerService } from '@bll/services/governance/GovernanceTrackerService';
 import { StatsAnalyticsService } from '@bll/services/stats/StatsAnalyticsService';
+import { IncidentImportNormalizerService } from '@bll/services/incidents/import/IncidentImportNormalizerService';
+import { IncidentBulkImportService } from '@bll/services/incidents/import/IncidentBulkImportService';
 
 @Module({
   providers: [
@@ -28,6 +30,8 @@ import { StatsAnalyticsService } from '@bll/services/stats/StatsAnalyticsService
     IncidentAuditService,
     GovernanceTrackerService,
     StatsAnalyticsService,
+    IncidentImportNormalizerService,
+    IncidentBulkImportService,
   ],
   exports: [
     LoginService,
@@ -43,6 +47,8 @@ import { StatsAnalyticsService } from '@bll/services/stats/StatsAnalyticsService
     IncidentAuditService,
     GovernanceTrackerService,
     StatsAnalyticsService,
+    IncidentImportNormalizerService,
+    IncidentBulkImportService,
   ],
 })
 export class BllModule {}

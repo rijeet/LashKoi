@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "installCommand": "npm install --prefix ../.. --include=dev",
   "buildCommand": "npm run build --workspace=@lashkoi/api --prefix ../..",
+  "outputDirectory": "public",
   "rewrites": [
     {
       "source": "/(.*)",

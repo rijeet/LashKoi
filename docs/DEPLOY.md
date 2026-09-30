@@ -57,9 +57,11 @@ npm run api:seed:demo   # optional
 | Setting | Value |
 |---------|--------|
 | **Root Directory** | `apps/api` |
+| **Framework Preset** | Other (`framework: null` in config) |
+| **Output Directory** | `public` (empty static dir; all routes → serverless — do not use `dist`) |
 | Config file | [`apps/api/vercel.json`](../apps/api/vercel.json) |
 
-Build installs the monorepo from `../..` and runs `nest build`. All HTTP traffic is rewritten to the single serverless function [`apps/api/api/index.ts`](../apps/api/api/index.ts) (Nest on Express).
+Build installs the monorepo from `../..` and runs `nest build`. All HTTP traffic is rewritten to the single serverless function [`apps/api/api/index.ts`](../apps/api/api/index.ts) (Nest on Express). Nest output stays in `dist/` and is bundled via `includeFiles` on the function.
 
 ### API environment variables
 

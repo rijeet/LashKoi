@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { apiBaseUrl } from './_api-base';
+import { apiBaseUrl } from './_api-base.js';
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   const upstream = await fetch(`${apiBaseUrl()}/robots.txt`);

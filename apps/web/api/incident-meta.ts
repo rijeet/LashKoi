@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { apiBaseUrl } from './_api-base';
-import { fetchIncidentSeoMeta, injectSeoIntoHtml } from '../src/lib/seo-meta';
+import { apiBaseUrl } from './_api-base.js';
+import { fetchIncidentSeoMeta, injectSeoIntoHtml } from '../src/lib/seo-meta.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const lang = req.query.lang === 'bn' ? 'bn' : 'en';

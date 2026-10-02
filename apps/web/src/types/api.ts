@@ -169,4 +169,5 @@ export interface AdminIncidentDto {
   publishedAt: string | null;
   updatedAt: string;
   media: IncidentMediaDto;
+  locationConfirmed?: boolean;
 }

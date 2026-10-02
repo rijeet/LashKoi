@@ -82,6 +82,26 @@
       "media": {
         "image": "https://picsum.photos/seed/lk-extortion/800/450"
       }
+    },
+    {
+      "slug": "extortion-dhaka-banglamotor-2026",
+      "type": "kidnap",
+      "titleEn": "Youth's Head Injured in Biriore, Motorbike Set Ablaze",
+      "titleBn": "বাংলামোটরে যুবকের মাথায় আঘাতের পর ফাঁকা গুলি, মোটরসাইকেলে আগুন",
+      "summaryEn": "A youth was injured in a brawl at the Banglamotor intersection in Dhaka. The injured youth was taken to Dhaka Medical College Hospital. The accused, Ferdous Ahmed Simon, was a former convener of the youth wing of Hatirjheel police station.",
+      "summaryBn": "বাংলামোটরে বিরোধের জেরে এক যুবকের মাথায় আঘাত করার পর দুই রাউন্ড ফাঁকা গুলি ছোড়ার অভিযোগ উঠেছে ফেরদৌস আহাম্মেদ সাইমন নামের এক ব্যক্তির বিরুদ্ধে।",
+      "placeNameEn": "Banglamotor, Dhaka",
+      "placeNameBn": "বাংলামোটর, ঢাকা",
+      "divisionPcode": "BD30",
+      "districtPcode": "BD3026",
+      "lat": 23.827,
+      "lng": 90.364,
+      "sourceLabel": "The Daily Star (Bangla)",
+      "sourceUrl": "https://bangla.thedailystar.net/news/bangladesh/news-3966631",
+      "occurredAt": "2026-10-01T14:10:00.000Z",
+      "media": {
+        "image": "https://bangla.thedailystar.net/sites/default/files/2026-10/01_1.jpg"
+      }
     }
   ]
 }

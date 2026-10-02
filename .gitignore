@@ -1,7 +1,10 @@
 # Dependencies
 node_modules/
 .pnp.*
-
+HTML_NEWS/
+HTML_NEWS_MD/
+docs/
+scripts/
 # Env (never commit secrets) — templates: apps/*/.env.example
 .env
 .env.*
@@ -30,13 +33,14 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
-
+config/
 # Local news harvest (never commit scraped output)
 tools/incident-harvest/output/
 tools/incident-harvest/input/*.local.*
 tools/incident-harvest/.cache/
 tools/incident-harvest/.env
-
+project-snapshot.md
+generate-project-snapshot.js
 # Cache
 .cache/
 *.local
